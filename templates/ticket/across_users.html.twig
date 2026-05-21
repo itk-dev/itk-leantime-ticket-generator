@@ -25,7 +25,7 @@
 
             <div>
                 {{ form_label(form.project) }}
-                {{ form_widget(form.project, { 'attr': { 'data-milestones-url': path('app_api_milestones', { projectId: '__PROJECT_ID__' }) } }) }}
+                {{ form_widget(form.project, {attr: {'data-milestones-url': path('app_api_milestones', {projectId: '__PROJECT_ID__'})}}) }}
                 {{ form_errors(form.project) }}
             </div>
 
@@ -50,7 +50,7 @@
 
             <div>
                 {{ form_label(form.planned_hours) }}
-                {{ form_widget(form.planned_hours, { 'attr': { 'data-manual-toggle': true } }) }}
+                {{ form_widget(form.planned_hours, {attr: {'data-manual-toggle': true}}) }}
                 {{ form_errors(form.planned_hours) }}
             </div>
 
@@ -80,7 +80,7 @@
 
             <div>
                 {{ form_label(form.new_milestone) }}
-                {{ form_widget(form.new_milestone, { 'attr': { 'placeholder': 'Leave empty to use selection above' } }) }}
+                {{ form_widget(form.new_milestone, {attr: {placeholder: 'Leave empty to use selection above'}}) }}
                 {{ form_errors(form.new_milestone) }}
             </div>
 

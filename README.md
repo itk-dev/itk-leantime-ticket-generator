@@ -56,7 +56,8 @@ Access the application via Traefik at `https://${COMPOSE_DOMAIN}` or directly on
 php bin/console asset-map:compile
 ```
 
-This writes optimized CSS/JS to `public/assets/`. In development, AssetMapper serves assets directly from `assets/` without a build step.
+This writes optimized CSS/JS to `public/assets/`. In development, AssetMapper
+serves assets directly from `assets/` without a build step.
 
 ### Clear and warm cache
 
@@ -67,7 +68,7 @@ php bin/console cache:warmup --env=prod
 
 ## Project structure
 
-```
+```text
 src/
   Controller/
     TicketController.php      # Slim controller - routing, forms, templates only

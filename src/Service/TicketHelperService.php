@@ -131,7 +131,7 @@ readonly class TicketHelperService
      *
      * @param string|null $milestone    the selected existing milestone ID
      * @param string|null $newMilestone the name for a new milestone to create
-     * @param int         $projectId   the project to find/create the milestone in
+     * @param int         $projectId    the project to find/create the milestone in
      *
      * @return array{id: int|null, created: bool} the resolved milestone ID and whether it was newly created
      *

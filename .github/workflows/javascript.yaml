@@ -14,24 +14,24 @@
 name: JavaScript
 
 on:
-  pull_request:
-  push:
-    branches:
-      - main
-      - develop
+    pull_request:
+    push:
+        branches:
+            - main
+            - develop
 
 jobs:
-  javascript-lint:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
+    javascript-lint:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v5
 
-      - name: Create docker network
-        run: |
-          docker network create frontend
+            - name: Create docker network
+              run: |
+                  docker network create frontend
 
-      - run: |
-          docker compose run --rm prettier 'assets/**/*.js' --check
+            - run: |
+                  docker compose run --rm prettier 'assets/**/*.js' --check

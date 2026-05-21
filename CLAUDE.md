@@ -9,20 +9,25 @@
 ## Service classes
 
 ### PHPDoc
+
 - Every service class must have a descriptive class-level PHPDoc block.
 - Every public method must have a PHPDoc block with `@param`, `@return`, and `@throws` annotations.
 - Use one-line `/** ... */` comments for constants.
 
 ### Constants
+
 - Extract magic values (strings, numbers, field names) into typed class constants.
 - Constants must have a one-line PHPDoc comment above them.
 - Use `private const` by default, `public const` only when needed by other classes.
-- Examples of what should be constants: API field values, status/priority IDs, date formats, fallback strings, form option values.
+- Examples: API field values, status/priority IDs, date formats, fallback strings,
+  form option values.
 
 ### Structure
+
 - Service classes should be `readonly` where possible.
 - Constructor promotion for dependencies.
-- API client logic (LeantimeService) is separate from form/business logic (TicketHelperService).
+- API client logic (LeantimeService) is separate from form/business logic
+  (TicketHelperService).
 
 ## Controllers
 
@@ -42,14 +47,16 @@
 - CSS lives in `assets/styles/`.
 - JS lives in `assets/js/`.
 - `assets/app.js` is the AssetMapper entry point that imports all CSS and JS.
-- When JS needs server-generated values (e.g., URLs), pass them via `data-` attributes on HTML elements.
+- When JS needs server-generated values (e.g., URLs), pass them via `data-`
+  attributes on HTML elements.
 - Use CSS classes instead of inline `style` attributes.
 
 ## Leantime API reference
 
 - Get projects: `leantime.rpc.projects.getAllProjects`
 - Get users: `leantime.rpc.users.getAll`
-- Get milestones: `leantime.rpc.tickets.getAllMilestones` (with `searchCriteria.currentProject`)
+- Get milestones: `leantime.rpc.tickets.getAllMilestones`
+  (with `searchCriteria.currentProject`)
 - Create milestone: `leantime.rpc.tickets.quickAddMilestone`
 - Create ticket: `leantime.rpc.tickets.addTicket`
 - Priority values: 1=Urgent, 2=High, 3=Medium, 4=Low, 5=Lowest

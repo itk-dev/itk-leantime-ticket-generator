@@ -64,11 +64,7 @@ class LeantimeService
         $data = $response->toArray(false);
 
         if (isset($data['error'])) {
-            throw new \RuntimeException(sprintf(
-                'Leantime API error (%d): %s',
-                $data['error']['code'] ?? 0,
-                $data['error']['message'] ?? 'Unknown error'
-            ));
+            throw new \RuntimeException(sprintf('Leantime API error (%d): %s', $data['error']['code'] ?? 0, $data['error']['message'] ?? 'Unknown error'));
         }
 
         return $data['result'] ?? null;

@@ -1,14 +1,14 @@
 # Disable services not needed for this project.
 services:
-  mariadb:
-    profiles:
-      - disabled
+    mariadb:
+        profiles:
+            - disabled
 
-  mail:
-    profiles:
-      - disabled
+    mail:
+        profiles:
+            - disabled
 
-  phpfpm:
-    depends_on: !reset []
-    environment:
-      - PHP_SENDMAIL_PATH=/usr/bin/true
+    phpfpm:
+        depends_on: !reset []
+        environment:
+            - PHP_SENDMAIL_PATH=/usr/bin/true
