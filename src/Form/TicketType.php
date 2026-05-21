@@ -54,6 +54,12 @@ class TicketType extends AbstractType
                 'required' => false,
                 'attr' => ['min' => 1],
             ])
+            ->add('priority', ChoiceType::class, [
+                'label' => 'Priority',
+                'choices' => $options['priority_choices'],
+                'data' => $options['default_priority'],
+                'required' => true,
+            ])
             ->add('tags', TextType::class, [
                 'label' => 'Tags',
                 'required' => false,
@@ -73,7 +79,9 @@ class TicketType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setRequired('project_choices');
+        $resolver->setRequired(['project_choices', 'priority_choices']);
         $resolver->setAllowedTypes('project_choices', 'array');
+        $resolver->setAllowedTypes('priority_choices', 'array');
+        $resolver->setDefault('default_priority', null);
     }
 }

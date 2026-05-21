@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Form\AcrossUsersType;
 use App\Form\TicketType;
-use App\Service\LeantimeService;
+use App\Service\TicketHelperService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,188 +20,99 @@ class TicketController extends AbstractController
     }
 
     #[Route('/across-projects', name: 'app_ticket_across_projects')]
-    public function acrossProjects(Request $request, LeantimeService $leantime): Response
+    public function acrossProjects(Request $request, TicketHelperService $helper): Response
     {
         try {
-            $projects = $leantime->getProjects();
-        } catch (\Exception $e) {
+            $projects = $helper->getProjects();
+            $projectChoices = $helper->getProjectChoices();
+        } catch (\Exception) {
             $this->addFlash('error', 'Could not connect to Leantime. Please check that LEANTIME_API_URL and LEANTIME_API_KEY are configured in .env.local.');
 
-            return $this->render('ticket/across_projects.html.twig', [
-                'form' => null,
-            ]);
+            return $this->render('ticket/across_projects.html.twig', ['form' => null]);
         }
 
-        $projectChoices = array_flip($projects);
+        $priorityChoices = $helper->getPriorityChoices();
 
         $form = $this->createForm(TicketType::class, null, [
             'project_choices' => $projectChoices,
+            'priority_choices' => $priorityChoices,
+            'default_priority' => $priorityChoices['High'],
         ]);
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $title = $data['title'];
-            $description = $data['description'] ?? '';
-            $projectIds = $data['projects'];
-            $tags = $data['tags'] ?? '';
-            $date = $data['due_date']->format('Y-m-d');
-            $plannedHours = $data['planned_hours'];
-            $hours = 'manual' === $plannedHours ? (float) ($data['manual_hours'] ?? 1) : (float) $plannedHours;
-            $milestone = $data['milestone'];
-
-            $results = [];
-
-            foreach ($projectIds as $projectId) {
-                try {
-                    $milestoneId = null;
-
-                    if (!empty($milestone)) {
-                        $milestoneId = $leantime->findOrCreateMilestone((int) $projectId, $milestone);
-                    }
-
-                    $ticketId = $leantime->createTicket($title, (int) $projectId, $description, $tags, $milestoneId, null, $date, $hours);
-                    $results[] = [
-                        'projectId' => $projectId,
-                        'projectName' => $projects[$projectId] ?? 'Unknown',
-                        'ticketId' => $ticketId,
-                        'success' => true,
-                    ];
-                } catch (\Exception $e) {
-                    $results[] = [
-                        'projectId' => $projectId,
-                        'projectName' => $projects[$projectId] ?? 'Unknown',
-                        'error' => $e->getMessage(),
-                        'success' => false,
-                    ];
-                }
-            }
+            $results = $helper->createTicketsAcrossProjects($form->getData(), $projects);
 
             return $this->render('ticket/success.html.twig', [
                 'results' => $results,
-                'title' => $title,
+                'title' => $form->getData()['title'],
             ]);
         }
 
-        return $this->render('ticket/across_projects.html.twig', [
-            'form' => $form,
-        ]);
+        return $this->render('ticket/across_projects.html.twig', ['form' => $form]);
     }
 
     #[Route('/across-users', name: 'app_ticket_across_users')]
-    public function acrossUsers(Request $request, LeantimeService $leantime): Response
+    public function acrossUsers(Request $request, TicketHelperService $helper): Response
     {
         try {
-            $projects = $leantime->getProjects();
-            $users = $leantime->getUsers();
-        } catch (\Exception $e) {
+            $projects = $helper->getProjects();
+            $users = $helper->getUsers();
+        } catch (\Exception) {
             $this->addFlash('error', 'Could not connect to Leantime. Please check that LEANTIME_API_URL and LEANTIME_API_KEY are configured in .env.local.');
 
-            return $this->render('ticket/across_users.html.twig', [
-                'form' => null,
-            ]);
+            return $this->render('ticket/across_users.html.twig', ['form' => null]);
         }
 
-        $projectChoices = array_flip($projects);
-        $userChoices = array_flip($users);
-
-        // Get milestones for the selected project (on POST), or empty
         $milestoneChoices = ['None' => ''];
         $selectedProject = $request->request->all('across_users')['project'] ?? null;
         if ($selectedProject) {
             try {
-                $milestones = $leantime->getMilestones((int) $selectedProject);
-                foreach ($milestones as $milestone) {
-                    if (isset($milestone['headline'], $milestone['id'])) {
-                        $milestoneChoices[$milestone['headline']] = $milestone['id'];
-                    }
-                }
+                $milestoneChoices = $helper->getMilestoneChoices((int) $selectedProject);
             } catch (\Exception) {
             }
         }
 
-        $form = $this->createForm(AcrossUsersType::class, null, [
-            'project_choices' => $projectChoices,
-            'user_choices' => $userChoices,
-            'milestone_choices' => $milestoneChoices,
-        ]);
+        $priorityChoices = $helper->getPriorityChoices();
 
+        $form = $this->createForm(AcrossUsersType::class, null, [
+            'project_choices' => $helper->getProjectChoices(),
+            'user_choices' => $helper->getUserChoices(),
+            'milestone_choices' => $milestoneChoices,
+            'priority_choices' => $priorityChoices,
+            'default_priority' => $priorityChoices['Lowest'],
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $title = $data['title'];
-            $description = $data['description'] ?? '';
-            $projectId = (int) $data['project'];
-            $userIds = $data['users'];
-            $tags = $data['tags'] ?? '';
-            $date = $data['date']->format('Y-m-d');
-            $plannedHours = $data['planned_hours'];
-            $hours = 'manual' === $plannedHours ? (float) ($data['manual_hours'] ?? 1) : (float) $plannedHours;
-            $milestoneId = $data['milestone'] ? (int) $data['milestone'] : null;
-            $newMilestone = $data['new_milestone'] ?? '';
+            $outcome = $helper->createTicketsAcrossUsers($form->getData(), $projects, $users);
 
-            // If a new milestone name was entered, use that instead
-            if (!empty($newMilestone)) {
-                try {
-                    $milestoneId = $leantime->findOrCreateMilestone($projectId, $newMilestone);
-                } catch (\Exception $e) {
-                    $this->addFlash('error', 'Failed to create milestone: '.$e->getMessage());
+            if ($outcome['milestoneError']) {
+                $this->addFlash('error', 'Failed to create milestone: '.$outcome['milestoneError']);
 
-                    return $this->render('ticket/across_users.html.twig', [
-                        'form' => $form,
-                    ]);
-                }
-            }
-
-            $results = [];
-
-            foreach ($userIds as $userId) {
-                try {
-                    $ticketId = $leantime->createTicket($title, $projectId, $description, $tags, $milestoneId, (int) $userId, $date, $hours);
-                    $results[] = [
-                        'projectId' => $projectId,
-                        'projectName' => $projects[$projectId] ?? 'Unknown',
-                        'userName' => $users[$userId] ?? 'Unknown',
-                        'ticketId' => $ticketId,
-                        'success' => true,
-                    ];
-                } catch (\Exception $e) {
-                    $results[] = [
-                        'projectId' => $projectId,
-                        'projectName' => $projects[$projectId] ?? 'Unknown',
-                        'userName' => $users[$userId] ?? 'Unknown',
-                        'error' => $e->getMessage(),
-                        'success' => false,
-                    ];
-                }
+                return $this->render('ticket/across_users.html.twig', ['form' => $form]);
             }
 
             return $this->render('ticket/success_users.html.twig', [
-                'results' => $results,
-                'title' => $title,
+                'results' => $outcome['results'],
+                'title' => $form->getData()['title'],
             ]);
         }
 
-        return $this->render('ticket/across_users.html.twig', [
-            'form' => $form,
-        ]);
+        return $this->render('ticket/across_users.html.twig', ['form' => $form]);
     }
 
     #[Route('/api/milestones/{projectId}', name: 'app_api_milestones', methods: ['GET'])]
-    public function milestones(int $projectId, LeantimeService $leantime): JsonResponse
+    public function milestones(int $projectId, TicketHelperService $helper): JsonResponse
     {
         try {
-            $milestones = $leantime->getMilestones($projectId);
-            $choices = [['label' => 'None', 'value' => '']];
-            foreach ($milestones as $milestone) {
-                if (isset($milestone['headline'], $milestone['id'])) {
-                    $choices[] = ['label' => $milestone['headline'], 'value' => $milestone['id']];
-                }
+            $choices = $helper->getMilestoneChoices($projectId);
+            $result = [];
+            foreach ($choices as $label => $value) {
+                $result[] = ['label' => $label, 'value' => $value];
             }
 
-            return $this->json($choices);
+            return $this->json($result);
         } catch (\Exception) {
             return $this->json([['label' => 'None', 'value' => '']], 500);
         }

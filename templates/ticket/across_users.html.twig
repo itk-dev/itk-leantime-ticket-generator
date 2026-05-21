@@ -61,6 +61,12 @@
             </div>
 
             <div>
+                {{ form_label(form.priority) }}
+                {{ form_widget(form.priority) }}
+                {{ form_errors(form.priority) }}
+            </div>
+
+            <div>
                 {{ form_label(form.tags) }}
                 {{ form_widget(form.tags) }}
                 {{ form_errors(form.tags) }}
