@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tickets Created{% endblock %}
+
+{% block body %}
+    <h1>Results for "{{ title }}"</h1>
+
+    {% for result in results %}
+        {% if result.success %}
+            <div class="success">
+                Ticket #{{ result.ticketId }} created in <strong>{{ result.projectName }}</strong> for <strong>{{ result.userName }}</strong>
+            </div>
+        {% else %}
+            <div class="error">
+                Failed for <strong>{{ result.userName }}</strong> in <strong>{{ result.projectName }}</strong>: {{ result.error }}
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    <a href="{{ path('app_ticket_across_users') }}"><button type="button">Create more tickets</button></a>
+    <a href="{{ path('app_home') }}"><button type="button" style="background: #666;">Home</button></a>
+{% endblock %}
