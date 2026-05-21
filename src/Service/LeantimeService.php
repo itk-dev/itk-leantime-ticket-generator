@@ -121,17 +121,17 @@ class LeantimeService
      * @param int    $projectId     the Leantime project ID
      * @param string $milestoneName the milestone name to find or create
      *
-     * @return int the milestone ID
+     * @return array{id: int, created: bool} the milestone ID and whether it was newly created
      *
      * @throws \RuntimeException if the milestone cannot be resolved after creation
      */
-    public function findOrCreateMilestone(int $projectId, string $milestoneName): int
+    public function findOrCreateMilestone(int $projectId, string $milestoneName): array
     {
         $milestones = $this->getMilestones($projectId);
 
         foreach ($milestones as $milestone) {
             if (isset($milestone['headline']) && mb_strtolower($milestone['headline']) === mb_strtolower($milestoneName)) {
-                return (int) $milestone['id'];
+                return ['id' => (int) $milestone['id'], 'created' => false];
             }
         }
 
@@ -147,7 +147,7 @@ class LeantimeService
 
         foreach ($milestones as $milestone) {
             if (isset($milestone['headline']) && mb_strtolower($milestone['headline']) === mb_strtolower($milestoneName)) {
-                return (int) $milestone['id'];
+                return ['id' => (int) $milestone['id'], 'created' => true];
             }
         }
 

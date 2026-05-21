@@ -5,6 +5,12 @@
 {% block body %}
     <h1>Results for "{{ title }}"</h1>
 
+    {% for ms in milestonesCreated %}
+        <div class="success">
+            Milestone #{{ ms.id }} "<strong>{{ ms.name }}</strong>" created in <strong>{{ ms.projectName }}</strong>
+        </div>
+    {% endfor %}
+
     {% for result in results %}
         {% if result.success %}
             <div class="success">

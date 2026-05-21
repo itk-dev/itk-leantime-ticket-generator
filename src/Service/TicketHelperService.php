@@ -133,21 +133,21 @@ readonly class TicketHelperService
      * @param string|null $newMilestone the name for a new milestone to create
      * @param int         $projectId   the project to find/create the milestone in
      *
-     * @return int|null the resolved milestone ID, or null if none selected
+     * @return array{id: int|null, created: bool} the resolved milestone ID and whether it was newly created
      *
      * @throws \RuntimeException if milestone creation fails
      */
-    public function resolveMilestoneId(?string $milestone, ?string $newMilestone, int $projectId): ?int
+    public function resolveMilestoneId(?string $milestone, ?string $newMilestone, int $projectId): array
     {
         if (!empty($newMilestone)) {
             return $this->leantime->findOrCreateMilestone($projectId, $newMilestone);
         }
 
         if (!empty($milestone)) {
-            return (int) $milestone;
+            return ['id' => (int) $milestone, 'created' => false];
         }
 
-        return null;
+        return ['id' => null, 'created' => false];
     }
 
     /**
@@ -160,7 +160,7 @@ readonly class TicketHelperService
      * @param array<string, mixed> $formData the validated form data
      * @param array<int, string>   $projects the full project id => name map for display purposes
      *
-     * @return array<int, array{projectId: int, projectName: string, ticketId?: int, error?: string, success: bool}> results per project
+     * @return array{results: array, milestonesCreated: array<string, string[]>} results per project and list of created milestones
      */
     public function createTicketsAcrossProjects(array $formData, array $projects): array
     {
@@ -174,13 +174,23 @@ readonly class TicketHelperService
         $milestone = $formData['milestone'];
 
         $results = [];
+        $milestonesCreated = [];
 
         foreach ($projectIds as $projectId) {
             try {
                 $milestoneId = null;
 
                 if (!empty($milestone)) {
-                    $milestoneId = $this->leantime->findOrCreateMilestone((int) $projectId, $milestone);
+                    $milestoneResult = $this->leantime->findOrCreateMilestone((int) $projectId, $milestone);
+                    $milestoneId = $milestoneResult['id'];
+
+                    if ($milestoneResult['created']) {
+                        $milestonesCreated[] = [
+                            'name' => $milestone,
+                            'id' => $milestoneResult['id'],
+                            'projectName' => $projects[$projectId] ?? self::UNKNOWN_PROJECT,
+                        ];
+                    }
                 }
 
                 $ticketId = $this->leantime->createTicket($title, (int) $projectId, $description, $tags, $milestoneId, null, $date, $hours, $priority);
@@ -200,7 +210,7 @@ readonly class TicketHelperService
             }
         }
 
-        return $results;
+        return ['results' => $results, 'milestonesCreated' => $milestonesCreated];
     }
 
     /**
@@ -214,7 +224,7 @@ readonly class TicketHelperService
      * @param array<int, string>   $projects the full project id => name map for display purposes
      * @param array<int, string>   $users    the full user id => name map for display purposes
      *
-     * @return array{results: array<int, array{projectId: int, projectName: string, userName: string, ticketId?: int, error?: string, success: bool}>, milestoneError: string|null}
+     * @return array{results: array, milestoneError: string|null, milestonesCreated: array}
      */
     public function createTicketsAcrossUsers(array $formData, array $projects, array $users): array
     {
@@ -226,15 +236,25 @@ readonly class TicketHelperService
         $date = $formData['date']->format(self::DATE_FORMAT);
         $hours = $this->resolveHours($formData['planned_hours'], $formData['manual_hours'] ?? null);
         $priority = $formData['priority'];
+        $milestonesCreated = [];
 
         try {
-            $milestoneId = $this->resolveMilestoneId(
+            $milestoneResult = $this->resolveMilestoneId(
                 $formData['milestone'] ?: null,
                 $formData['new_milestone'] ?? null,
                 $projectId,
             );
+            $milestoneId = $milestoneResult['id'];
+
+            if ($milestoneResult['created']) {
+                $milestonesCreated[] = [
+                    'name' => $formData['new_milestone'],
+                    'id' => $milestoneResult['id'],
+                    'projectName' => $projects[$projectId] ?? self::UNKNOWN_PROJECT,
+                ];
+            }
         } catch (\Exception $e) {
-            return ['results' => [], 'milestoneError' => $e->getMessage()];
+            return ['results' => [], 'milestoneError' => $e->getMessage(), 'milestonesCreated' => []];
         }
 
         $results = [];
@@ -260,6 +280,6 @@ readonly class TicketHelperService
             }
         }
 
-        return ['results' => $results, 'milestoneError' => null];
+        return ['results' => $results, 'milestoneError' => null, 'milestonesCreated' => $milestonesCreated];
     }
 }

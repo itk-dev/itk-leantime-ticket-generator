@@ -41,10 +41,11 @@ class TicketController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $results = $helper->createTicketsAcrossProjects($form->getData(), $projects);
+            $outcome = $helper->createTicketsAcrossProjects($form->getData(), $projects);
 
             return $this->render('ticket/success.html.twig', [
-                'results' => $results,
+                'results' => $outcome['results'],
+                'milestonesCreated' => $outcome['milestonesCreated'],
                 'title' => $form->getData()['title'],
             ]);
         }
@@ -95,6 +96,7 @@ class TicketController extends AbstractController
 
             return $this->render('ticket/success_users.html.twig', [
                 'results' => $outcome['results'],
+                'milestonesCreated' => $outcome['milestonesCreated'],
                 'title' => $form->getData()['title'],
             ]);
         }
