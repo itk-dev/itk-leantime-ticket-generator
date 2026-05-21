@@ -25,7 +25,7 @@
 
             <div>
                 {{ form_label(form.project) }}
-                {{ form_widget(form.project) }}
+                {{ form_widget(form.project, { 'attr': { 'data-milestones-url': path('app_api_milestones', { projectId: '__PROJECT_ID__' }) } }) }}
                 {{ form_errors(form.project) }}
             </div>
 
@@ -50,7 +50,7 @@
 
             <div>
                 {{ form_label(form.planned_hours) }}
-                {{ form_widget(form.planned_hours) }}
+                {{ form_widget(form.planned_hours, { 'attr': { 'data-manual-toggle': true } }) }}
                 {{ form_errors(form.planned_hours) }}
             </div>
 
@@ -86,42 +86,7 @@
 
             {{ form_widget(form.submit) }}
         {{ form_end(form) }}
-
-        <script>
-            const plannedSelect = document.getElementById('across_users_planned_hours');
-            const manualWrapper = document.getElementById('manual-hours-wrapper');
-
-            function toggleManual() {
-                const selected = plannedSelect.options[plannedSelect.selectedIndex];
-                const isManual = selected && selected.textContent.trim().toLowerCase().startsWith('manual');
-                manualWrapper.style.display = isManual ? '' : 'none';
-            }
-            toggleManual();
-            plannedSelect.addEventListener('change', toggleManual);
-
-            document.getElementById('across_users_project').addEventListener('change', function() {
-                const projectId = this.value;
-                const milestoneSelect = document.getElementById('across_users_milestone');
-
-                if (!projectId) {
-                    milestoneSelect.innerHTML = '<option value="">None</option>';
-                    return;
-                }
-
-                fetch('{{ path('app_api_milestones', { projectId: 0 }) }}'.replace('0', projectId))
-                    .then(r => r.json())
-                    .then(data => {
-                        milestoneSelect.innerHTML = '';
-                        data.forEach(item => {
-                            const opt = document.createElement('option');
-                            opt.value = item.value;
-                            opt.textContent = item.label;
-                            milestoneSelect.appendChild(opt);
-                        });
-                    });
-            });
-        </script>
     {% endif %}
 
-    <a href="{{ path('app_home') }}"><button type="button" style="background: #666;">Back</button></a>
+    <a href="{{ path('app_home') }}"><button type="button" class="btn-back">Back</button></a>
 {% endblock %}

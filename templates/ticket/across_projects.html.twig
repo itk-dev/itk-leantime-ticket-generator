@@ -44,7 +44,7 @@
 
             <div>
                 {{ form_label(form.planned_hours) }}
-                {{ form_widget(form.planned_hours) }}
+                {{ form_widget(form.planned_hours, { 'attr': { 'data-manual-toggle': true } }) }}
                 {{ form_errors(form.planned_hours) }}
             </div>
 
@@ -74,20 +74,7 @@
 
             {{ form_widget(form.submit) }}
         {{ form_end(form) }}
-
-        <script>
-            const plannedSelect = document.getElementById('ticket_planned_hours');
-            const manualWrapper = document.getElementById('manual-hours-wrapper');
-
-            function toggleManual() {
-                const selected = plannedSelect.options[plannedSelect.selectedIndex];
-                const isManual = selected && selected.textContent.trim().toLowerCase().startsWith('manual');
-                manualWrapper.style.display = isManual ? '' : 'none';
-            }
-            toggleManual();
-            plannedSelect.addEventListener('change', toggleManual);
-        </script>
     {% endif %}
 
-    <a href="{{ path('app_home') }}"><button type="button" style="background: #666;">Back</button></a>
+    <a href="{{ path('app_home') }}"><button type="button" class="btn-back">Back</button></a>
 {% endblock %}
