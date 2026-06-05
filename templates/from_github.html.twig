@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}From GitHub Issues{% endblock %}
+
+{% block body %}
+    <h1>Create Tickets From GitHub</h1>
+
+    {% for message in app.flashes('error') %}
+        <div class="error">{{ message }}</div>
+    {% endfor %}
+
+    <form method="get" action="{{ path('app_ticket_from_github_select') }}" data-github-setup>
+        <div>
+            <label for="github-repo">GitHub repository</label>
+            <select id="github-repo" name="repo" required data-github-repo>
+                <option value="">-- Select a repository --</option>
+                {% for label, value in repoChoices %}
+                    <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="github-project">Leantime project</label>
+            <select id="github-project" name="projectId" required data-github-project>
+                <option value="">-- Select a project --</option>
+                {% for label, value in projectChoices %}
+                    <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <fieldset class="github-source" data-github-source disabled>
+            <legend>Source</legend>
+            <div class="checkbox-row">
+                <input type="radio" id="github-source-issues" name="source" value="issues" data-github-source-input>
+                <label for="github-source-issues">Create tickets from issues</label>
+            </div>
+            <div class="checkbox-row">
+                <input type="radio" id="github-source-milestones" name="source" value="milestones" data-github-source-input>
+                <label for="github-source-milestones">Create tickets from milestones</label>
+            </div>
+        </fieldset>
+
+        <button type="submit" data-github-continue disabled>Continue</button>
+    </form>
+
+    <a href="{{ path('app_home') }}"><button type="button" class="btn-back">Back</button></a>
+{% endblock %}
