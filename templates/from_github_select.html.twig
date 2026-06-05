@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Select GitHub items{% endblock %}
+
+{% block body %}
+    <h1>
+        Import {{ source == 'milestones' ? 'milestones' : 'issues' }} from <em>{{ repo }}</em>
+    </h1>
+
+    {% for message in app.flashes('error') %}
+        <div class="error">{{ message }}</div>
+    {% endfor %}
+
+    {% if form is null %}
+        <div class="error">
+            No open {{ source == 'milestones' ? 'milestones' : 'issues' }} were found in this repository.
+        </div>
+        <a href="{{ path('app_ticket_from_github') }}"><button type="button" class="btn-back">Back</button></a>
+    {% else %}
+        {{ form_start(form) }}
+            <table class="github-table">
+                <thead>
+                    <tr>
+                        <th class="col-include">Include</th>
+                        <th class="col-title">Title</th>
+                        <th class="col-hours">Planned hours</th>
+                        <th class="col-priority">Priority</th>
+                        <th class="col-due">Due date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in form.rows %}
+                        <tr>
+                            <td class="col-include">{{ form_widget(row.include) }}</td>
+                            <td class="col-title">
+                                {{ row.vars.value.title|default('') }}
+                                {{ form_widget(row.number) }}
+                                {{ form_widget(row.title) }}
+                                {{ form_widget(row.description) }}
+                                {{ form_widget(row.html_url) }}
+                                {{ form_widget(row.labels) }}
+                            </td>
+                            <td class="col-hours">{{ form_widget(row.planned_hours) }}</td>
+                            <td class="col-priority">{{ form_widget(row.priority) }}</td>
+                            <td class="col-due">{{ form_widget(row.due_date) }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {{ form_widget(form.submit) }}
+        {{ form_end(form) }}
+    {% endif %}
+
+    <a href="{{ path('app_ticket_from_github') }}"><button type="button" class="btn-back">Back</button></a>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Across Users{% endblock %}
+
+{% block body %}
+    <h1>Create Tickets Across Users</h1>
+
+    {% for message in app.flashes('error') %}
+        <div class="error">{{ message }}</div>
+    {% endfor %}
+
+    {% if form is not null %}
+        {{ form_start(form) }}
+            <div>
+                {{ form_label(form.title) }}
+                {{ form_widget(form.title) }}
+                {{ form_errors(form.title) }}
+            </div>
+
+            <div>
+                {{ form_label(form.description) }}
+                {{ form_widget(form.description) }}
+                {{ form_errors(form.description) }}
+            </div>
+
+            <div>
+                {{ form_label(form.project) }}
+                {{ form_widget(form.project, {attr: {'data-milestones-url': path('app_api_milestones', {projectId: '__PROJECT_ID__'})}}) }}
+                {{ form_errors(form.project) }}
+            </div>
+
+            <div>
+                {{ form_label(form.users) }}
+                <div class="checkbox-list">
+                    {% for child in form.users %}
+                        <div class="checkbox-row">
+                            {{ form_widget(child) }}
+                            {{ form_label(child) }}
+                        </div>
+                    {% endfor %}
+                </div>
+                {{ form_errors(form.users) }}
+            </div>
+
+            <div>
+                {{ form_label(form.date) }}
+                {{ form_widget(form.date) }}
+                {{ form_errors(form.date) }}
+            </div>
+
+            <div>
+                {{ form_label(form.planned_hours) }}
+                {{ form_widget(form.planned_hours, {attr: {'data-manual-toggle': true}}) }}
+                {{ form_errors(form.planned_hours) }}
+            </div>
+
+            <div id="manual-hours-wrapper" style="display: none;">
+                {{ form_label(form.manual_hours) }}
+                {{ form_widget(form.manual_hours) }}
+                {{ form_errors(form.manual_hours) }}
+            </div>
+
+            <div>
+                {{ form_label(form.priority) }}
+                {{ form_widget(form.priority) }}
+                {{ form_errors(form.priority) }}
+            </div>
+
+            <div>
+                {{ form_label(form.tags) }}
+                {{ form_widget(form.tags) }}
+                {{ form_errors(form.tags) }}
+            </div>
+
+            <div>
+                {{ form_label(form.milestone) }}
+                {{ form_widget(form.milestone) }}
+                {{ form_errors(form.milestone) }}
+            </div>
+
+            <div>
+                {{ form_label(form.new_milestone) }}
+                {{ form_widget(form.new_milestone, {attr: {placeholder: 'Leave empty to use selection above'}}) }}
+                {{ form_errors(form.new_milestone) }}
+            </div>
+
+            {{ form_widget(form.submit) }}
+        {{ form_end(form) }}
+    {% endif %}
+
+    <a href="{{ path('app_home') }}"><button type="button" class="btn-back">Back</button></a>
+{% endblock %}

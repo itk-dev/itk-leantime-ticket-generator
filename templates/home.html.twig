@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Leantime Ticket Generator{% endblock %}
+
+{% block body %}
+    <h1>Leantime Ticket Generator</h1>
+
+    <div class="button-group">
+        <a href="{{ path('app_ticket_across_projects') }}" class="btn">Across Projects</a>
+        <a href="{{ path('app_ticket_across_users') }}" class="btn">Across Users</a>
+        <a href="{{ path('app_ticket_from_github') }}" class="btn">From GitHub Issues</a>
+    </div>
+{% endblock %}

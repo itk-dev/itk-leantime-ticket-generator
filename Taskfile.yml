@@ -1,0 +1,134 @@
+version: "3"
+
+dotenv: [".env.local", ".env"]
+
+vars:
+    DOCKER_COMPOSE: '{{.TASK_DOCKER_COMPOSE | default "docker compose"}}'
+
+tasks:
+    default:
+        desc: List available tasks
+        cmds:
+            - task --list
+
+    compose:
+        desc: Run docker compose command
+        cmds:
+            - "{{.DOCKER_COMPOSE}} {{.CLI_ARGS}}"
+
+    compose-up:
+        desc: Start Docker containers
+        cmds:
+            - "{{.DOCKER_COMPOSE}} up -d"
+
+    composer:
+        desc: Run composer command
+        cmds:
+            - "{{.DOCKER_COMPOSE}} exec phpfpm composer {{.CLI_ARGS}}"
+
+    console:
+        desc: Run Symfony console command
+        cmds:
+            - "{{.DOCKER_COMPOSE}} exec phpfpm bin/console {{.CLI_ARGS}}"
+
+    # --- Coding standards checks (mirrors GitHub Actions) ---
+
+    coding-standards-php-check:
+        desc: Check PHP coding standards (PHP CS Fixer)
+        cmds:
+            - "{{.DOCKER_COMPOSE}} run --rm phpfpm vendor/bin/php-cs-fixer fix --dry-run --diff"
+
+    coding-standards-php-apply:
+        desc: Apply PHP coding standards (PHP CS Fixer)
+        cmds:
+            - "{{.DOCKER_COMPOSE}} run --rm phpfpm vendor/bin/php-cs-fixer fix"
+
+    coding-standards-twig-check:
+        desc: Check Twig coding standards
+        cmds:
+            - "{{.DOCKER_COMPOSE}} run --rm phpfpm vendor/bin/twig-cs-fixer lint"
+
+    coding-standards-twig-apply:
+        desc: Apply Twig coding standards
+        cmds:
+            - "{{.DOCKER_COMPOSE}} run --rm phpfpm vendor/bin/twig-cs-fixer lint --fix"
+
+    coding-standards-markdown-check:
+        desc: Check Markdown coding standards
+        cmds:
+            - "{{.DOCKER_COMPOSE}} run --rm markdownlint markdownlint '**/*.md'"
+
+    coding-standards-javascript-check:
+        desc: Check JavaScript coding standards (Prettier)
+        cmds:
+            - "{{.DOCKER_COMPOSE}} run --rm prettier 'assets/**/*.js' --check"
+
+    coding-standards-javascript-apply:
+        desc: Apply JavaScript coding standards (Prettier)
+        cmds:
+            - "{{.DOCKER_COMPOSE}} run --rm prettier 'assets/**/*.js' --write"
+
+    coding-standards-styles-check:
+        desc: Check CSS/SCSS coding standards (Prettier)
+        cmds:
+            - "{{.DOCKER_COMPOSE}} run --rm prettier 'assets/**/*.{css,scss}' --check"
+
+    coding-standards-styles-apply:
+        desc: Apply CSS/SCSS coding standards (Prettier)
+        cmds:
+            - "{{.DOCKER_COMPOSE}} run --rm prettier 'assets/**/*.{css,scss}' --write"
+
+    coding-standards-yaml-check:
+        desc: Check YAML coding standards (Prettier)
+        cmds:
+            - "{{.DOCKER_COMPOSE}} run --rm prettier '**/*.{yml,yaml}' --check"
+
+    coding-standards-yaml-apply:
+        desc: Apply YAML coding standards (Prettier)
+        cmds:
+            - "{{.DOCKER_COMPOSE}} run --rm prettier '**/*.{yml,yaml}' --write"
+
+    composer-validate:
+        desc: Validate composer.json
+        cmds:
+            - "{{.DOCKER_COMPOSE}} run --rm phpfpm composer validate --strict"
+
+    composer-normalize-check:
+        desc: Check composer.json is normalized
+        cmds:
+            - "{{.DOCKER_COMPOSE}} run --rm phpfpm composer normalize --dry-run"
+
+    composer-normalize-apply:
+        desc: Normalize composer.json
+        cmds:
+            - "{{.DOCKER_COMPOSE}} run --rm phpfpm composer normalize"
+
+    composer-audit:
+        desc: Audit composer dependencies for vulnerabilities
+        cmds:
+            - "{{.DOCKER_COMPOSE}} run --rm phpfpm composer audit"
+
+    # --- Aggregate tasks ---
+
+    ci:
+        desc: Run all coding standards checks (mirrors GitHub Actions)
+        cmds:
+            - task: composer-validate
+            - task: composer-normalize-check
+            - task: composer-audit
+            - task: coding-standards-php-check
+            - task: coding-standards-twig-check
+            - task: coding-standards-markdown-check
+            - task: coding-standards-javascript-check
+            - task: coding-standards-styles-check
+            - task: coding-standards-yaml-check
+
+    fix:
+        desc: Apply all auto-fixable coding standards
+        cmds:
+            - task: coding-standards-php-apply
+            - task: coding-standards-twig-apply
+            - task: coding-standards-javascript-apply
+            - task: coding-standards-styles-apply
+            - task: coding-standards-yaml-apply
+            - task: composer-normalize-apply

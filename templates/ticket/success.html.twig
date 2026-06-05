@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tickets Created{% endblock %}
+
+{% block body %}
+    <h1>Results for "{{ title }}"</h1>
+
+    {% for ms in milestonesCreated %}
+        <div class="success">
+            Milestone #{{ ms.id }} "<strong>{{ ms.name }}</strong>" created in <strong>{{ ms.projectName }}</strong>
+        </div>
+    {% endfor %}
+
+    {% for result in results %}
+        {% if result.success %}
+            <div class="success">
+                Ticket #{{ result.ticketId }} created in <strong>{{ result.projectName }}</strong>
+            </div>
+        {% else %}
+            <div class="error">
+                Failed in <strong>{{ result.projectName }}</strong>: {{ result.error }}
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    <a href="{{ path('app_ticket_across_projects') }}"><button type="button">Create more tickets</button></a>
+    <a href="{{ path('app_home') }}"><button type="button" class="btn-back">Home</button></a>
+{% endblock %}
