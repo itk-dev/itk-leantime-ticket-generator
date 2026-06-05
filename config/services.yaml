@@ -7,6 +7,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    default_github_api_url: 'https://api.github.com'
 
 services:
     # default configuration for services in *this* file
@@ -23,3 +24,9 @@ services:
         arguments:
             $leantimeApiUrl: '%env(LEANTIME_API_URL)%'
             $leantimeApiKey: '%env(LEANTIME_API_KEY)%'
+
+    App\Service\GitHubService:
+        arguments:
+            $githubApiUrl: '%env(default:default_github_api_url:GITHUB_API_URL)%'
+            $githubOrg: '%env(string:default::GITHUB_ORG)%'
+            $githubToken: '%env(string:default::GITHUB_TOKEN)%'

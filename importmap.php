@@ -16,4 +16,11 @@ return [
         'path' => './assets/app.js',
         'entrypoint' => true,
     ],
+    'choices.js' => [
+        'version' => '11.2.3',
+    ],
+    'choices.js/public/assets/styles/choices.min.css' => [
+        'version' => '11.2.3',
+        'type' => 'css',
+    ],
 ];

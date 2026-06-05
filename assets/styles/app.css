@@ -116,3 +116,137 @@ input[type="submit"]:hover {
     border-radius: 4px;
     margin: 0.5rem 0;
 }
+
+.github-source {
+    margin-top: 1.5rem;
+    padding: 0.5rem 1rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.github-source legend {
+    font-weight: 600;
+    padding: 0 0.5rem;
+}
+
+.github-source:disabled {
+    opacity: 0.5;
+}
+
+button[disabled],
+input[type="submit"][disabled] {
+    background: #9aa5b1;
+    cursor: not-allowed;
+}
+
+button[disabled]:hover,
+input[type="submit"][disabled]:hover {
+    background: #9aa5b1;
+}
+
+/* Choices.js — restyle to match the project's native select look. */
+.choices {
+    margin-bottom: 0;
+}
+
+.choices__inner {
+    min-height: 0;
+    padding: 0.5rem;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    box-sizing: border-box;
+}
+
+.choices.is-focused .choices__inner,
+.choices.is-open .choices__inner {
+    border-color: #1a56db;
+}
+
+.choices[data-type*="select-one"] .choices__inner {
+    padding-bottom: 0.5rem;
+}
+
+.choices[data-type*="select-one"]::after {
+    right: 0.75rem;
+    border-color: #666 transparent transparent;
+}
+
+.choices__list--single {
+    padding: 0 1.5rem 0 0;
+}
+
+.choices__list--single .choices__item {
+    font-size: 0.85rem;
+    line-height: 1.25rem;
+}
+
+.choices__list--dropdown,
+.choices__list[aria-expanded] {
+    margin-top: 0;
+    border: 1px solid #1a56db;
+    border-radius: 0 0 4px 4px;
+    font-size: 0.85rem;
+}
+
+.choices__list--dropdown .choices__item--selectable.is-highlighted,
+.choices__list[aria-expanded] .choices__item--selectable.is-highlighted {
+    background: #e8efff;
+}
+
+.choices__input {
+    background: #fff;
+    margin: 0;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.85rem;
+}
+
+.github-table {
+    width: 100%;
+    margin-top: 1rem;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.github-table th,
+.github-table td {
+    padding: 0.5rem;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.github-table th {
+    background: #f5f5f5;
+    font-weight: 600;
+}
+
+.github-table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.github-table .col-include {
+    width: 4rem;
+    text-align: center;
+}
+
+.github-table .col-hours {
+    width: 8rem;
+}
+
+.github-table .col-priority {
+    width: 8rem;
+}
+
+.github-table .col-due {
+    width: 10rem;
+}
+
+.github-table input[type="number"],
+.github-table input[type="date"],
+.github-table select {
+    margin: 0;
+    padding: 0.25rem;
+    font-size: 0.85rem;
+}
